@@ -1,853 +1,1088 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JX CGPA Calculator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #050505;
-            --bg-card: #0d0d0d;
-            --bg-hover: #151515;
-            --text-primary: #f5f5f5;
-            --text-secondary: #a3a3a3;
-            --gold-light: #f9e596;
-            --gold-main: #d4af37;
-            --gold-dark: #aa8529;
-            --border-subtle: #222222;
-            --border-gold: rgba(212, 175, 55, 0.2);
-            --glow-gold: 0 0 20px rgba(212, 175, 55, 0.15);
+            --bg-deep: #030303;
+            --bg-base: #07070a;
+            --bg-card: #0c0c10;
+            --bg-card2: #101014;
+            --bg-hover: #141418;
+            --text-primary: #f0ece4;
+            --text-secondary: #7a7468;
+            --text-muted: #3d3a36;
+            --gold-light: #fef3c0;
+            --gold-pale: #e8d08a;
+            --gold-main: #c9a227;
+            --gold-deep: #9a7a1a;
+            --gold-dark: #6b5212;
+            --border-subtle: #18181c;
+            --border-mid: #222228;
+            --border-gold: rgba(201, 162, 39, 0.18);
+            --border-gold-strong: rgba(201, 162, 39, 0.35);
+            --glow-soft: 0 0 30px rgba(201, 162, 39, 0.08);
+            --glow-mid: 0 0 25px rgba(201, 162, 39, 0.15);
+            --radius-card: 18px;
+            --radius-sm: 10px;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             background-color: var(--bg-base);
             background-image:
-                radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.04) 0%, transparent 50%);
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201, 162, 39, 0.025) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(201, 162, 39, 0.02) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='none'/%3E%3Ccircle cx='0' cy='0' r='0.5' fill='rgba(201,162,39,0.12)'/%3E%3Ccircle cx='80' cy='0' r='0.5' fill='rgba(201,162,39,0.12)'/%3E%3Ccircle cx='0' cy='80' r='0.5' fill='rgba(201,162,39,0.12)'/%3E%3Ccircle cx='80' cy='80' r='0.5' fill='rgba(201,162,39,0.12)'/%3E%3C/svg%3E");
             color: var(--text-primary);
-            margin: 0;
-            padding: 40px 20px;
             min-height: 100vh;
+            padding: 0;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        /* HEADER */
-        header {
+        /* === HEADER === */
+        .site-header {
+            padding: 60px 24px 50px;
             text-align: center;
-            margin-bottom: 50px;
-            padding: 20px 0;
             position: relative;
         }
 
-        header::after {
+        .site-header::before {
             content: '';
-            display: block;
-            width: 150px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-main), transparent);
-            margin: 25px auto 0;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--gold-main), transparent);
+        }
+
+        .header-eyebrow {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 5px;
+            color: var(--gold-main);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0.7;
         }
 
         h1 {
-            font-family: 'Cinzel', serif;
-            margin: 0;
-            font-size: 42px;
-            letter-spacing: 4px;
-            color: var(--gold-main);
-            text-transform: uppercase;
-            font-weight: 600;
-            text-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
-        }
-
-        p.subtitle {
-            margin: 15px 0 0 0;
-            color: var(--text-secondary);
-            font-size: 15px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(44px, 8vw, 78px);
             font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        /* SERIES SELECTOR */
-        .series-selector {
-            background: var(--bg-card);
-            padding: 35px;
-            border-radius: 20px;
-            margin-bottom: 35px;
-            text-align: center;
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .series-selector::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
-        }
-
-        .selector-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-            color: var(--text-secondary);
-        }
-
-        .radio-group {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-        }
-
-        .radio-label {
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            cursor: pointer;
-            padding: 14px 40px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 30px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--bg-base);
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .radio-group input[type="radio"] {
-            display: none;
-        }
-
-        .radio-group input[type="radio"]:checked+.radio-label {
-            background-color: var(--gold-main);
-            color: #000;
-            border-color: var(--gold-main);
-            box-shadow: var(--glow-gold);
-            font-weight: 600;
-        }
-
-        /* GPA DASHBOARD */
-        .gpa-dashboard {
-            background: linear-gradient(145deg, #111111 0%, #0a0a0a 100%);
-            border: 1px solid var(--border-gold);
-            padding: 50px 20px;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            position: relative;
-        }
-
-        .gpa-title {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 4px;
-            font-size: 13px;
-            color: var(--gold-light);
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
-
-        .gpa-value {
-            font-family: 'Cinzel', serif;
-            font-size: 80px;
-            font-weight: 400;
-            margin: 0;
-            color: var(--gold-main);
-            text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
-            line-height: 1;
-        }
-
-        .gpa-credits {
-            font-size: 13px;
-            color: var(--text-secondary);
-            letter-spacing: 1px;
-            margin-top: 15px;
-            font-weight: 300;
-        }
-
-        /* SUBJECT CARDS */
-        .subject-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 25px;
-            border: 1px solid var(--border-subtle);
-            border-left: 3px solid var(--border-subtle);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .subject-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            border-left-color: var(--gold-main);
-            background: var(--bg-hover);
-        }
-
-        .subject-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-subtle);
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .subject-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            font-size: 18px;
+            letter-spacing: -1px;
             color: var(--text-primary);
-            letter-spacing: 1px;
-        }
-
-        .meta-badges {
-            display: flex;
-            gap: 12px;
-        }
-
-        .badge {
-            font-size: 10px;
-            background: var(--bg-base);
-            color: var(--text-secondary);
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .badge.credit-badge {
-            background: rgba(212, 175, 55, 0.05);
-            color: var(--gold-main);
-            border-color: rgba(212, 175, 55, 0.2);
-        }
-
-        /* INPUTS */
-        .inputs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 20px;
-            align-items: end;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        label {
-            font-size: 10px;
-            margin-bottom: 10px;
-            font-weight: 400;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        input {
-            padding: 14px 10px;
-            background: var(--bg-base);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            font-size: 16px;
-            color: var(--text-primary);
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        input:focus {
-            border-color: var(--gold-main);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-            background: #000;
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-
-        /* RESULTS */
-        .result-box {
-            background: var(--bg-base);
-            border: 1px solid var(--border-subtle);
-            padding: 12px;
-            text-align: center;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 48px;
-            margin-top: auto;
-            box-sizing: border-box;
-        }
-
-        .result-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 1.5px;
+            line-height: 0.95;
             margin-bottom: 6px;
         }
 
-        .result-val {
+        h1 em {
+            font-style: italic;
+            color: var(--gold-pale);
+            font-weight: 300;
+        }
+
+        .subtitle {
+            margin-top: 18px;
+            font-size: 13px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+        }
+
+        /* === MAIN LAYOUT === */
+        .main-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* === LEFT COLUMN === */
+        .left-col { display: flex; flex-direction: column; gap: 20px; }
+
+        /* === RIGHT SIDEBAR === */
+        .right-sidebar {
+            position: sticky;
+            top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* === GPA DISPLAY === */
+        .gpa-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--radius-card);
+            padding: 36px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gpa-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .gpa-panel-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            color: var(--gold-main);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .gpa-numeral {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 88px;
+            font-weight: 300;
+            color: var(--gold-pale);
+            line-height: 1;
+            letter-spacing: -3px;
+            text-shadow: 0 0 60px rgba(201, 162, 39, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .gpa-divider {
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-main), transparent);
+            margin: 18px auto;
+        }
+
+        .gpa-credits-note {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* === GRADE LEGEND === */
+        .legend-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 22px 24px;
+        }
+
+        .legend-title {
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .legend-item {
+            background: var(--bg-base);
+            border: 1px solid var(--border-mid);
+            border-radius: 8px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        .legend-grade {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--gold-pale);
+            display: block;
+            line-height: 1;
+        }
+
+        .legend-range {
+            font-size: 8px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* === SERIES TOGGLE === */
+        .series-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 24px;
+        }
+
+        .series-label {
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 400;
+        }
+
+        .toggle-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .toggle-wrap input[type="radio"] { display: none; }
+
+        .toggle-opt {
+            display: block;
+            text-align: center;
+            padding: 12px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-mid);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-base);
+        }
+
+        .toggle-wrap input[type="radio"]:checked + .toggle-opt {
+            background: var(--gold-main);
+            color: #000;
+            border-color: var(--gold-main);
             font-weight: 600;
+            box-shadow: var(--glow-mid);
+        }
+
+        /* === SUBJECT CARDS === */
+        .subject-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--border-mid);
+            transition: background 0.3s ease;
+        }
+
+        .subject-card:hover {
+            border-color: var(--border-gold);
+            background: var(--bg-hover);
+            box-shadow: var(--glow-soft);
+        }
+
+        .subject-card:hover::before {
+            background: linear-gradient(to bottom, var(--gold-main), var(--gold-deep));
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 22px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .card-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.3;
+            flex: 1;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 5px 12px;
+            border-radius: 30px;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            border: 1px solid var(--border-mid);
+            color: var(--text-secondary);
+            background: var(--bg-base);
+        }
+
+        .badge-gold {
+            border-color: rgba(201, 162, 39, 0.3);
+            color: var(--gold-main);
+            background: rgba(201, 162, 39, 0.05);
+        }
+
+        /* === INPUTS === */
+        .inputs-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-unit {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 100px;
+            min-width: 90px;
+        }
+
+        .input-unit label {
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .input-unit input {
+            width: 100%;
+            padding: 13px 10px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-mid);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .input-unit input:focus {
+            border-color: var(--gold-main);
+            background: rgba(201, 162, 39, 0.04);
+            box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.08);
+        }
+
+        .input-unit input::-webkit-outer-spin-button,
+        .input-unit input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .input-unit input[type=number] { -moz-appearance: textfield; }
+
+        /* === RESULT CHIPS === */
+        .result-chip {
+            flex: 1 1 90px;
+            min-width: 80px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-mid);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+        }
+
+        .chip-label {
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+
+        .chip-val {
             font-size: 16px;
+            font-weight: 600;
             color: var(--text-primary);
         }
 
-        .total-box {
-            border: 1px solid var(--border-gold);
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+        .chip-total {
+            border-color: var(--border-gold);
+            background: rgba(201, 162, 39, 0.04);
         }
 
-        .total-box .result-val {
-            color: var(--gold-main);
-            font-family: 'Outfit', sans-serif;
-            font-size: 18px;
-        }
-
-        .grade-display {
-            font-family: 'Cinzel', serif;
+        .chip-total .chip-val {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 20px;
+            color: var(--gold-pale);
+        }
+
+        .chip-grade .chip-val {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
             color: var(--gold-light);
+            font-style: italic;
         }
 
-        /* RESPONSIVENESS */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 28px;
-            }
-
-            .gpa-value {
-                font-size: 56px;
-            }
-
-            .inputs-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .radio-group {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .subject-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .meta-badges {
-                width: 100%;
-                justify-content: flex-start;
-            }
+        /* === MODAL === */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0; visibility: hidden;
+            transition: all 0.4s ease;
+            padding: 20px;
         }
+
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold-strong);
+            border-radius: 24px;
+            padding: 50px 40px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6), var(--glow-mid);
+            transform: translateY(30px) scale(0.97);
+            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-ornament {
+            width: 40px;
+            height: 1px;
+            background: var(--gold-main);
+            margin: 0 auto 28px;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 38px;
+            font-weight: 400;
+            color: var(--gold-pale);
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+            font-style: italic;
+        }
+
+        .modal-body {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 36px;
+        }
+
+        .modal-cta {
+            background: transparent;
+            border: 1px solid var(--gold-main);
+            color: var(--gold-pale);
+            padding: 13px 36px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .modal-cta:hover {
+            background: var(--gold-main);
+            color: #000;
+            box-shadow: var(--glow-mid);
+        }
+
+        /* === FOOTER DECORATION === */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 8px 0;
+        }
+
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .section-divider-dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--gold-dark);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .main-wrapper {
+                grid-template-columns: 1fr;
+                padding: 24px 16px 60px;
+                gap: 20px;
+            }
+
+            .right-sidebar {
+                position: static;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+
+            .gpa-panel { grid-column: 1 / -1; }
+        }
+
+        @media (max-width: 600px) {
+            .site-header { padding: 40px 16px 40px; }
+
+            h1 { font-size: 42px; }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .gpa-numeral { font-size: 72px; }
+
+            .card-top { flex-direction: column; align-items: flex-start; }
+
+            .card-badges { flex-direction: row; }
+
+            .input-unit { flex: 1 1 calc(50% - 6px); min-width: unset; }
+
+            .result-chip { flex: 1 1 calc(50% - 6px); }
+
+            .inputs-flex { gap: 10px; }
+
+            .modal-box { padding: 36px 24px 30px; }
+
+            .modal-title { font-size: 30px; }
+
+            .subject-card { padding: 22px 18px; }
+
+            .toggle-wrap { gap: 8px; }
+        }
+
+        @media (max-width: 380px) {
+            .input-unit { flex: 1 1 100%; }
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-card {
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .subject-card:nth-child(1) { animation-delay: 0.05s; }
+        .subject-card:nth-child(2) { animation-delay: 0.10s; }
+        .subject-card:nth-child(3) { animation-delay: 0.15s; }
+        .subject-card:nth-child(4) { animation-delay: 0.20s; }
+        .subject-card:nth-child(5) { animation-delay: 0.25s; }
+
+        .gpa-numeral { transition: color 0.3s ease, text-shadow 0.3s ease; }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <header>
-            <h1>JX CGPA Calculator</h1>
-            <p class="subtitle">Enter your exact marks out of 100; dynamic conversion and analysis happen instantly.</p>
-        </header>
-
-        <div class="series-selector">
-            <div class="selector-title">SELECT YOUR ACADEMIC SERIES</div>
-            <div class="radio-group">
-                <div>
-                    <input type="radio" id="seriesA" name="seriesToggle" value="A" checked
-                        onchange="toggleSeriesSubj()">
-                    <label for="seriesA" class="radio-label">A Series</label>
-                </div>
-                <div>
-                    <input type="radio" id="seriesB" name="seriesToggle" value="B" onchange="toggleSeriesSubj()">
-                    <label for="seriesB" class="radio-label">B Series</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="gpa-dashboard">
-            <div class="gpa-title">Estimated Semester CGPA</div>
-            <div class="gpa-value" id="final-gpa">0.00</div>
-            <div class="gpa-credits">Total Registered Credits: 23</div>
-        </div>
-
-        <div id="calculator-form">
-            <!-- MAT101 -->
-            <div class="subject-card" data-pattern="C" data-credits="4">
-                <div class="subject-header">
-                    <div class="subject-title">MAT101 - ODE, Numerical Methods & Complex Variable</div>
-                    <div class="meta-badges"><span class="badge credit-badge">4 Credits</span><span
-                            class="badge">Pattern C</span></div>
-                </div>
-                <div class="inputs-grid">
-                    <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100" class="s1"
-                            value="0"></div>
-                    <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100" class="s2"
-                            value="0"></div>
-                    <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100" class="mid"
-                            value="0"></div>
-                    <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                            value="0"></div>
-                    <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                            class="est" value="0"></div>
-                    <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15" class="esp"
-                            value="0"></div>
-                    <div class="result-box total-box">
-                        <div class="result-label">Total</div>
-                        <div class="result-val total-display">0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Grade</div>
-                        <div class="result-val grade-display">-</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- IKS100/MEC102 -->
-            <div class="subject-card" data-pattern="A" data-credits="3">
-                <div class="subject-header">
-                    <div class="subject-title">IKS100/MEC102/TAM100/TAM102</div>
-                    <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                            class="badge">Pattern A</span></div>
-                </div>
-                <div class="inputs-grid">
-                    <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100" class="s1"
-                            value="0"></div>
-                    <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100" class="s2"
-                            value="0"></div>
-                    <div class="input-group"><label>Assign (Max 100)</label><input type="number" max="100" class="asg"
-                            value="0"></div>
-                    <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                            class="est" value="0"></div>
-                    <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15" class="esp"
-                            value="0"></div>
-                    <div class="result-box total-box">
-                        <div class="result-label">Total</div>
-                        <div class="result-val total-display">0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Grade</div>
-                        <div class="result-val grade-display">-</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MEC101 -->
-            <div class="subject-card" data-pattern="B" data-credits="2">
-                <div class="subject-header">
-                    <div class="subject-title">MEC101 - Design Thinking and Innovation</div>
-                    <div class="meta-badges"><span class="badge credit-badge">2 Credits</span><span
-                            class="badge">Pattern B</span></div>
-                </div>
-                <div class="inputs-grid">
-                    <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100" class="s1"
-                            value="0"></div>
-                    <div class="input-group"><label>OET (Max 100)</label><input type="number" max="100" class="oet"
-                            value="0"></div>
-                    <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                            value="0"></div>
-                    <div class="input-group"><label>Project (Max 100)</label><input type="number" max="100" class="proj"
-                            value="0"></div>
-                    <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100" class="mid"
-                            value="0"></div>
-                    <div class="result-box total-box">
-                        <div class="result-label">Total</div>
-                        <div class="result-val total-display">0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Grade</div>
-                        <div class="result-val grade-display">-</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CSE108 -->
-            <div class="subject-card" data-pattern="C" data-credits="3">
-                <div class="subject-header">
-                    <div class="subject-title">CSE108 - Problem Solving Using Computer Programming</div>
-                    <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                            class="badge">Pattern C</span></div>
-                </div>
-                <div class="inputs-grid">
-                    <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100" class="s1"
-                            value="0"></div>
-                    <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100" class="s2"
-                            value="0"></div>
-                    <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100" class="mid"
-                            value="0"></div>
-                    <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                            value="0"></div>
-                    <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                            class="est" value="0"></div>
-                    <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15" class="esp"
-                            value="0"></div>
-                    <div class="result-box total-box">
-                        <div class="result-label">Total</div>
-                        <div class="result-val total-display">0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Grade</div>
-                        <div class="result-val grade-display">-</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CSE101 -->
-            <div class="subject-card" data-pattern="A-50" data-credits="3">
-                <div class="subject-header">
-                    <div class="subject-title">CSE101 - Applied AI</div>
-                    <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                            class="badge">Pattern A (50 Marks)</span></div>
-                </div>
-                <div class="inputs-grid">
-                    <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100" class="s1"
-                            value="0"></div>
-                    <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100" class="s2"
-                            value="0"></div>
-                    <div class="input-group"><label>Assign (Max 100)</label><input type="number" max="100" class="asg"
-                            value="0"></div>
-                    <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                            class="est" value="0"></div>
-                    <div class="result-box total-box">
-                        <div class="result-label">Total</div>
-                        <div class="result-val total-display">0</div>
-                    </div>
-                    <div class="result-box">
-                        <div class="result-label">Grade</div>
-                        <div class="result-val grade-display">-</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="series-fields series-A-container">
-                <!-- CHY100 -->
-                <div class="subject-card" data-pattern="C" data-credits="3">
-                    <div class="subject-header">
-                        <div class="subject-title">CHY100 - Fundamentals of Materials Chemistry</div>
-                        <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                                class="badge">Pattern C</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100"
-                                class="s2" value="0"></div>
-                        <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100"
-                                class="mid" value="0"></div>
-                        <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                                value="0"></div>
-                        <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                                class="est" value="0"></div>
-                        <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15"
-                                class="esp" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- EEE100 -->
-                <div class="subject-card" data-pattern="C" data-credits="3">
-                    <div class="subject-header">
-                        <div class="subject-title">EEE100 - Basic Electrical and Electronics Engineering</div>
-                        <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                                class="badge">Pattern C</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100"
-                                class="s2" value="0"></div>
-                        <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100"
-                                class="mid" value="0"></div>
-                        <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                                value="0"></div>
-                        <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                                class="est" value="0"></div>
-                        <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15"
-                                class="esp" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- YOG100 -->
-                <div class="subject-card" data-pattern="B" data-credits="2">
-                    <div class="subject-header">
-                        <div class="subject-title">YOG100 - Yoga for Youth Empowerment</div>
-                        <div class="meta-badges"><span class="badge credit-badge">2 Credits</span><span
-                                class="badge">Pattern B</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>OET (Max 100)</label><input type="number" max="100" class="oet"
-                                value="0"></div>
-                        <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                                value="0"></div>
-                        <div class="input-group"><label>Project (Max 100)</label><input type="number" max="100"
-                                class="proj" value="0"></div>
-                        <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100"
-                                class="mid" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="series-fields series-B-container" style="display: none;">
-                <!-- PHY100 -->
-                <div class="subject-card" data-pattern="C" data-credits="3">
-                    <div class="subject-header">
-                        <div class="subject-title">PHY100 - Engineering Physics</div>
-                        <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                                class="badge">Pattern C</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100"
-                                class="s2" value="0"></div>
-                        <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100"
-                                class="mid" value="0"></div>
-                        <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                                value="0"></div>
-                        <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                                class="est" value="0"></div>
-                        <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15"
-                                class="esp" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENG100 -->
-                <div class="subject-card" data-pattern="C" data-credits="3">
-                    <div class="subject-header">
-                        <div class="subject-title">ENG100 - English for Engineers</div>
-                        <div class="meta-badges"><span class="badge credit-badge">3 Credits</span><span
-                                class="badge">Pattern C</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100"
-                                class="s2" value="0"></div>
-                        <div class="input-group"><label>Mid Sem (Max 100)</label><input type="number" max="100"
-                                class="mid" value="0"></div>
-                        <div class="input-group"><label>RLP (Max 100)</label><input type="number" max="100" class="rlp"
-                                value="0"></div>
-                        <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                                class="est" value="0"></div>
-                        <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15"
-                                class="esp" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BIT100 -->
-                <div class="subject-card" data-pattern="A" data-credits="2">
-                    <div class="subject-header">
-                        <div class="subject-title">BIT100 - Biology for Engineers</div>
-                        <div class="meta-badges"><span class="badge credit-badge">2 Credits</span><span
-                                class="badge">Pattern A</span></div>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group"><label>Sess 1 (Max 100)</label><input type="number" max="100"
-                                class="s1" value="0"></div>
-                        <div class="input-group"><label>Sess 2 (Max 100)</label><input type="number" max="100"
-                                class="s2" value="0"></div>
-                        <div class="input-group"><label>Assign (Max 100)</label><input type="number" max="100"
-                                class="asg" value="0"></div>
-                        <div class="input-group"><label>End Sem Th (Max 100)</label><input type="number" max="100"
-                                class="est" value="0"></div>
-                        <div class="input-group"><label>End Sem Pr (Max 15)</label><input type="number" max="15"
-                                class="esp" value="0"></div>
-                        <div class="result-box total-box">
-                            <div class="result-label">Total</div>
-                            <div class="result-val total-display">0</div>
-                        </div>
-                        <div class="result-box">
-                            <div class="result-label">Grade</div>
-                            <div class="result-val grade-display">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+<!-- Modal -->
+<div id="infoModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-ornament"></div>
+        <h2 class="modal-title">A Note</h2>
+        <p class="modal-body">This calculator is still being refined for elective and mandatory courses — but core subjects and the grading system work perfectly. Enter your marks out of 100 and watch everything calculate in real time.</p>
+        <button class="modal-cta" onclick="closeModal()">Got it</button>
     </div>
+</div>
 
-    <script>
-        function toggleSeriesSubj() {
-            const isSeriesA = document.getElementById('seriesA').checked;
-            if (isSeriesA) {
-                document.querySelector('.series-A-container').style.display = 'block';
-                document.querySelector('.series-B-container').style.display = 'none';
-            } else {
-                document.querySelector('.series-A-container').style.display = 'none';
-                document.querySelector('.series-B-container').style.display = 'block';
+<header class="site-header">
+    <p class="header-eyebrow">Kalasalingam University · Semester Tool</p>
+    <h1>JX <em>CGPA</em><br>Calculator</h1>
+    <p class="subtitle">Enter exact marks out of 100 — conversion & grading happen live.</p>
+</header>
+
+<div class="main-wrapper">
+
+    <!-- LEFT: Subject Cards -->
+    <div class="left-col" id="calculator-form">
+
+        <!-- Series Toggle (mobile-first, top of left col) -->
+        <div class="series-panel" style="display:none" id="series-panel-mobile">
+            <div class="series-label">Academic Series</div>
+            <div class="toggle-wrap">
+                <input type="radio" id="seriesA2" name="seriesToggle" value="A">
+                <label for="seriesA2" class="toggle-opt">A Series</label>
+                <input type="radio" id="seriesB2" name="seriesToggle" value="B">
+                <label for="seriesB2" class="toggle-opt">B Series</label>
+            </div>
+        </div>
+
+        <!-- MAT101 -->
+        <div class="subject-card" data-pattern="C" data-credits="4">
+            <div class="card-top">
+                <div class="card-name">MAT101 — ODE, Numerical Methods &amp; Complex Variable</div>
+                <div class="card-badges">
+                    <span class="badge badge-gold">4 Credits</span>
+                    <span class="badge">Pattern C</span>
+                </div>
+            </div>
+            <div class="inputs-flex">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0" placeholder="0"></div>
+                <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0" placeholder="0"></div>
+                <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0" placeholder="0"></div>
+                <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0" placeholder="0"></div>
+                <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0" placeholder="0"></div>
+                <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0" placeholder="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- IKS100 -->
+        <div class="subject-card" data-pattern="A-50" data-credits="3">
+            <div class="card-top">
+                <div class="card-name">IKS100 / MEC102 / TAM100 / TAM102</div>
+                <div class="card-badges">
+                    <span class="badge badge-gold">3 Credits</span>
+                    <span class="badge">Pattern A · 50M</span>
+                </div>
+            </div>
+            <div class="inputs-flex">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                <div class="input-unit"><label>Assignment</label><input type="number" max="100" class="asg" value="0"></div>
+                <div class="input-unit"><label>End Sem</label><input type="number" max="100" class="est" value="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEC101 -->
+        <div class="subject-card" data-pattern="B" data-credits="2">
+            <div class="card-top">
+                <div class="card-name">MEC101 — Design Thinking and Innovation</div>
+                <div class="card-badges">
+                    <span class="badge badge-gold">2 Credits</span>
+                    <span class="badge">Pattern B</span>
+                </div>
+            </div>
+            <div class="inputs-flex">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                <div class="input-unit"><label>OET</label><input type="number" max="100" class="oet" value="0"></div>
+                <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                <div class="input-unit"><label>Project</label><input type="number" max="100" class="proj" value="0"></div>
+                <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSE108 -->
+        <div class="subject-card" data-pattern="C" data-credits="3">
+            <div class="card-top">
+                <div class="card-name">CSE108 — Problem Solving Using Computer Programming</div>
+                <div class="card-badges">
+                    <span class="badge badge-gold">3 Credits</span>
+                    <span class="badge">Pattern C</span>
+                </div>
+            </div>
+            <div class="inputs-flex">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSE101 -->
+        <div class="subject-card" data-pattern="A-50" data-credits="3">
+            <div class="card-top">
+                <div class="card-name">CSE101 — Applied AI</div>
+                <div class="card-badges">
+                    <span class="badge badge-gold">3 Credits</span>
+                    <span class="badge">Pattern A · 50M</span>
+                </div>
+            </div>
+            <div class="inputs-flex">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                <div class="input-unit"><label>Assignment</label><input type="number" max="100" class="asg" value="0"></div>
+                <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SERIES A -->
+        <div class="series-fields series-A-container">
+            <div class="section-divider">
+                <div class="section-divider-line"></div>
+                <div class="section-divider-dot"></div>
+                <div class="section-divider-line"></div>
+            </div>
+
+            <div class="subject-card" data-pattern="C" data-credits="3">
+                <div class="card-top">
+                    <div class="card-name">CHY100 — Fundamentals of Materials Chemistry</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">3 Credits</span>
+                        <span class="badge">Pattern C</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                    <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                    <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                    <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subject-card" data-pattern="C" data-credits="3">
+                <div class="card-top">
+                    <div class="card-name">EEE100 — Basic Electrical and Electronics Engineering</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">3 Credits</span>
+                        <span class="badge">Pattern C</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                    <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                    <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                    <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subject-card" data-pattern="B" data-credits="2">
+                <div class="card-top">
+                    <div class="card-name">YOG100 — Yoga for Youth Empowerment</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">2 Credits</span>
+                        <span class="badge">Pattern B</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>OET</label><input type="number" max="100" class="oet" value="0"></div>
+                    <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                    <div class="input-unit"><label>Project</label><input type="number" max="100" class="proj" value="0"></div>
+                    <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SERIES B -->
+        <div class="series-fields series-B-container" style="display:none">
+            <div class="section-divider">
+                <div class="section-divider-line"></div>
+                <div class="section-divider-dot"></div>
+                <div class="section-divider-line"></div>
+            </div>
+
+            <div class="subject-card" data-pattern="C" data-credits="3">
+                <div class="card-top">
+                    <div class="card-name">PHY100 — Engineering Physics</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">3 Credits</span>
+                        <span class="badge">Pattern C</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                    <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                    <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                    <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subject-card" data-pattern="C" data-credits="3">
+                <div class="card-top">
+                    <div class="card-name">ENG100 — English for Engineers</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">3 Credits</span>
+                        <span class="badge">Pattern C</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                    <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
+                    <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
+                    <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subject-card" data-pattern="A" data-credits="2">
+                <div class="card-top">
+                    <div class="card-name">BIT100 — Biology for Engineers</div>
+                    <div class="card-badges">
+                        <span class="badge badge-gold">2 Credits</span>
+                        <span class="badge">Pattern A</span>
+                    </div>
+                </div>
+                <div class="inputs-flex">
+                    <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                    <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                    <div class="input-unit"><label>Assignment</label><input type="number" max="100" class="asg" value="0"></div>
+                    <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
+                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                    <div class="result-chip chip-total">
+                        <span class="chip-label">Total</span>
+                        <span class="chip-val total-display">0</span>
+                    </div>
+                    <div class="result-chip chip-grade">
+                        <span class="chip-label">Grade</span>
+                        <span class="chip-val grade-display">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end left-col -->
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="right-sidebar">
+
+        <!-- GPA Panel -->
+        <div class="gpa-panel">
+            <div class="gpa-panel-label">Semester GPA</div>
+            <div class="gpa-numeral" id="final-gpa">0.00</div>
+            <div class="gpa-divider"></div>
+            <div class="gpa-credits-note">23 Registered Credits</div>
+        </div>
+
+        <!-- Series Toggle -->
+        <div class="series-panel">
+            <div class="series-label">Academic Series</div>
+            <div class="toggle-wrap">
+                <input type="radio" id="seriesA" name="seriesToggle" value="A" checked onchange="toggleSeriesSubj()">
+                <label for="seriesA" class="toggle-opt">A Series</label>
+                <input type="radio" id="seriesB" name="seriesToggle" value="B" onchange="toggleSeriesSubj()">
+                <label for="seriesB" class="toggle-opt">B Series</label>
+            </div>
+        </div>
+
+        <!-- Grade Legend -->
+        <div class="legend-panel">
+            <div class="legend-title">Grade Scale</div>
+            <div class="legend-grid">
+                <div class="legend-item"><span class="legend-grade">S</span><span class="legend-range">≥ 90</span></div>
+                <div class="legend-item"><span class="legend-grade">A</span><span class="legend-range">≥ 80</span></div>
+                <div class="legend-item"><span class="legend-grade">B</span><span class="legend-range">≥ 70</span></div>
+                <div class="legend-item"><span class="legend-grade">C</span><span class="legend-range">≥ 60</span></div>
+                <div class="legend-item"><span class="legend-grade">D</span><span class="legend-range">≥ 50</span></div>
+                <div class="legend-item"><span class="legend-grade">E</span><span class="legend-range">≥ 45</span></div>
+                <div class="legend-item"><span class="legend-grade">P</span><span class="legend-range">≥ 40</span></div>
+                <div class="legend-item"><span class="legend-grade">F</span><span class="legend-range">< 40</span></div>
+            </div>
+        </div>
+
+    </aside>
+</div>
+
+<script>
+    // Set A series default on load
+    document.getElementById('seriesA').checked = true;
+
+    window.addEventListener('load', () => {
+        document.getElementById('infoModal').classList.add('show');
+    });
+
+    function closeModal() {
+        document.getElementById('infoModal').classList.remove('show');
+    }
+
+    function toggleSeriesSubj() {
+        const isA = document.querySelector('input[name="seriesToggle"]:checked').value === 'A';
+        document.querySelector('.series-A-container').style.display = isA ? 'flex' : 'none';
+        document.querySelector('.series-B-container').style.display = isA ? 'none' : 'flex';
+        document.querySelector('.series-A-container').style.flexDirection = 'column';
+        document.querySelector('.series-A-container').style.gap = '20px';
+        document.querySelector('.series-B-container').style.flexDirection = 'column';
+        document.querySelector('.series-B-container').style.gap = '20px';
+        calculateAll();
+    }
+
+    function getGrade(marks) {
+        if (marks === 0) return { grade: '—', points: 0 };
+        if (marks >= 90) return { grade: 'S', points: 10 };
+        if (marks >= 80) return { grade: 'A', points: 9 };
+        if (marks >= 70) return { grade: 'B', points: 8 };
+        if (marks >= 60) return { grade: 'C', points: 7 };
+        if (marks >= 50) return { grade: 'D', points: 6 };
+        if (marks >= 45) return { grade: 'E', points: 5 };
+        if (marks >= 40) return { grade: 'P', points: 4 };
+        return { grade: 'F', points: 0 };
+    }
+
+    function calculateAll() {
+        const series = document.querySelector('input[name="seriesToggle"]:checked').value;
+        const form = document.getElementById('calculator-form');
+        const cards = form.querySelectorAll('.subject-card');
+        let totalWeighted = 0, totalCredits = 0, active = 0;
+
+        cards.forEach(card => {
+            const parent = card.parentElement;
+            if (parent.classList.contains('series-fields')) {
+                if (series === 'A' && parent.classList.contains('series-B-container')) return;
+                if (series === 'B' && parent.classList.contains('series-A-container')) return;
             }
-            calculateAll();
-        }
 
-        function getGradeDetails(marks) {
-            if (marks === 0) return { grade: '-', points: 0 };
-            if (marks >= 90) return { grade: 'S', points: 10 };
-            if (marks >= 80) return { grade: 'A', points: 9 };
-            if (marks >= 70) return { grade: 'B', points: 8 };
-            if (marks >= 60) return { grade: 'C', points: 7 };
-            if (marks >= 50) return { grade: 'D', points: 6 };
-            if (marks >= 45) return { grade: 'E', points: 5 };
-            if (marks >= 40) return { grade: 'P', points: 4 };
-            return { grade: 'F', points: 0 };
-        }
+            const pattern = card.getAttribute('data-pattern');
+            const credits = parseInt(card.getAttribute('data-credits'));
+            const g = (sel) => { const el = card.querySelector(sel); return el ? parseFloat(el.value) || 0 : 0; };
+            let total = 0;
 
-        function calculateAll() {
-            const selectedSeries = document.querySelector('input[name="seriesToggle"]:checked').value;
-            const form = document.getElementById('calculator-form');
-            const cards = form.querySelectorAll('.subject-card');
+            if (pattern === 'A') {
+                total = g('.s1')*0.175 + g('.s2')*0.175 + g('.asg')*0.15 + g('.est')*0.35 + g('.esp');
+            } else if (pattern === 'A-50') {
+                total = g('.s1')*0.175 + g('.s2')*0.175 + g('.asg')*0.15 + g('.est')*0.5;
+            } else if (pattern === 'B') {
+                total = g('.s1')*0.10 + g('.oet')*0.20 + g('.rlp')*0.20 + g('.proj')*0.30 + g('.mid')*0.20;
+            } else if (pattern === 'C') {
+                total = g('.s1')*0.175 + g('.s2')*0.175 + g('.mid')*0.10 + g('.rlp')*0.05 + g('.est')*0.35 + g('.esp');
+            }
 
-            let totalWeightedPoints = 0;
-            let totalCredits = 0;
-            let activeCardsWithMarks = 0;
-
-            cards.forEach(card => {
-                const parentWrapper = card.parentElement;
-                if (parentWrapper.classList.contains('series-fields')) {
-                    if (selectedSeries === 'A' && parentWrapper.classList.contains('series-B-container')) return;
-                    if (selectedSeries === 'B' && parentWrapper.classList.contains('series-A-container')) return;
-                }
-
-                const pattern = card.getAttribute('data-pattern');
-                const credits = parseInt(card.getAttribute('data-credits'));
-                let total = 0;
-
-                const getVal = (selector) => {
-                    const el = card.querySelector(selector);
-                    return el ? parseFloat(el.value) || 0 : 0;
-                };
-
-                if (pattern === 'A') {
-                    let s1_conv = getVal('.s1') * 0.175;
-                    let s2_conv = getVal('.s2') * 0.175;
-                    let asg_conv = getVal('.asg') * 0.15;
-                    let est_conv = getVal('.est') * 0.35;
-                    total = s1_conv + s2_conv + asg_conv + est_conv + getVal('.esp');
-                } else if (pattern === 'A-50') {
-                    let s1_conv = getVal('.s1') * 0.175;
-                    let s2_conv = getVal('.s2') * 0.175;
-                    let asg_conv = getVal('.asg') * 0.15;
-                    let est_conv = getVal('.est') * 0.5;
-                    total = s1_conv + s2_conv + asg_conv + est_conv;
-                } else if (pattern === 'B') {
-                    let s1_conv = getVal('.s1') * 0.10;
-                    let oet_conv = getVal('.oet') * 0.20;
-                    let rlp_conv = getVal('.rlp') * 0.20;
-                    let proj_conv = getVal('.proj') * 0.30;
-                    let mid_conv = getVal('.mid') * 0.20;
-                    total = s1_conv + oet_conv + rlp_conv + proj_conv + mid_conv;
-                } else if (pattern === 'C') {
-                    let s1_conv = getVal('.s1') * 0.175;
-                    let s2_conv = getVal('.s2') * 0.175;
-                    let mid_conv = getVal('.mid') * 0.10;
-                    let rlp_conv = getVal('.rlp') * 0.05;
-                    let est_conv = getVal('.est') * 0.35;
-                    total = s1_conv + s2_conv + mid_conv + rlp_conv + est_conv + getVal('.esp');
-                }
-
-                if (total > 100) total = 100;
-
-                card.querySelector('.total-display').innerText = total.toFixed(1);
-
-                const gradeInfo = getGradeDetails(total);
-                card.querySelector('.grade-display').innerText = gradeInfo.grade;
-
-                if (total > 0) {
-                    activeCardsWithMarks++;
-                }
-
-                totalWeightedPoints += (gradeInfo.points * credits);
-                totalCredits += credits;
-            });
-
-            const finalGPA = (totalCredits > 0 && activeCardsWithMarks > 0) ? (totalWeightedPoints / totalCredits) : 0;
-            document.getElementById('final-gpa').innerText = finalGPA.toFixed(2);
-        }
-
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', calculateAll);
+            if (total > 100) total = 100;
+            card.querySelector('.total-display').textContent = total.toFixed(1);
+            const { grade, points } = getGrade(total);
+            card.querySelector('.grade-display').textContent = grade;
+            if (total > 0) active++;
+            totalWeighted += points * credits;
+            totalCredits += credits;
         });
 
-        calculateAll();
-    </script>
+        const gpa = (totalCredits > 0 && active > 0) ? (totalWeighted / totalCredits) : 0;
+        const gpaEl = document.getElementById('final-gpa');
+        gpaEl.textContent = gpa.toFixed(2);
+        gpaEl.style.color = gpa >= 8.5 ? '#fef3c0' : gpa >= 7 ? '#c9a227' : gpa >= 5 ? '#9a7a1a' : '#6b5212';
+    }
 
+    // Apply flex to series containers on init
+    document.querySelector('.series-A-container').style.cssText = 'display:flex;flex-direction:column;gap:20px;';
+    document.querySelector('.series-B-container').style.cssText = 'display:none;flex-direction:column;gap:20px;';
+
+    document.querySelectorAll('input[type="number"]').forEach(inp => {
+        inp.addEventListener('input', calculateAll);
+    });
+
+    calculateAll();
+</script>
 </body>
-
 </html>
