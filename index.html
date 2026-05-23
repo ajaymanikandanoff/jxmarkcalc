@@ -599,6 +599,92 @@
             .input-unit { flex: 1 1 100%; }
         }
 
+        /* === PATTERN SWITCHER === */
+        .pattern-switcher {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            position: relative;
+        }
+
+        .psw-btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 30px;
+            border: 1px solid var(--border-mid);
+            background: var(--bg-base);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .psw-btn:hover {
+            border-color: var(--border-gold);
+            color: var(--gold-pale);
+        }
+
+        .psw-btn.psw-active {
+            background: var(--gold-main);
+            border-color: var(--gold-main);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* === DEPT DROPDOWN === */
+        .dept-dropdown-wrap {
+            position: relative;
+        }
+
+        .dept-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card2);
+            border: 1px solid var(--border-gold);
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: 160px;
+            z-index: 100;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .dept-dropdown.open { display: block; }
+
+        .dept-opt {
+            display: block;
+            width: 100%;
+            padding: 10px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .dept-opt:last-child { border-bottom: none; }
+
+        .dept-opt:hover {
+            background: rgba(201,162,39,0.08);
+            color: var(--gold-pale);
+        }
+
+        .dept-opt.selected {
+            color: var(--gold-main);
+            font-weight: 600;
+        }
+
         /* === ANIMATIONS === */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -730,22 +816,50 @@
             </div>
         </div>
 
-        <!-- CSE108 -->
-        <div class="subject-card" data-pattern="C" data-credits="3">
+        <!-- Dept. Course -->
+        <div class="subject-card" id="cse108-card" data-pattern="C" data-credits="3">
             <div class="card-top">
-                <div class="card-name">CSE108 — Problem Solving Using Computer Programming</div>
+                <div class="card-name">Dept. Course</div>
                 <div class="card-badges">
                     <span class="badge badge-gold">3 Credits</span>
-                    <span class="badge">Pattern C</span>
+                    <div class="pattern-switcher">
+                        <button class="psw-btn psw-active" onclick="switchCSE108('C', this)">CSE108 / INT100</button>
+                        <div class="dept-dropdown-wrap">
+                            <button class="psw-btn" id="dept-toggle-btn" onclick="toggleDeptDropdown(event, this)">Dept. Course ▾</button>
+                            <div class="dept-dropdown" id="dept-dropdown">
+                                <button class="dept-opt" onclick="selectDept('AER100', this)">AER100</button>
+                                <button class="dept-opt" onclick="selectDept('EEE200', this)">EEE200</button>
+                                <button class="dept-opt" onclick="selectDept('ECE101', this)">ECE101</button>
+                                <button class="dept-opt" onclick="selectDept('CVL100', this)">CVL100</button>
+                                <button class="dept-opt" onclick="selectDept('MEC200', this)">MEC200</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="inputs-flex">
+            <!-- Pattern C inputs -->
+            <div class="inputs-flex" id="cse108-patC">
                 <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
                 <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
                 <div class="input-unit"><label>Mid Sem</label><input type="number" max="100" class="mid" value="0"></div>
                 <div class="input-unit"><label>RLP</label><input type="number" max="100" class="rlp" value="0"></div>
                 <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
                 <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
+                <div class="result-chip chip-total">
+                    <span class="chip-label">Total</span>
+                    <span class="chip-val total-display">0</span>
+                </div>
+                <div class="result-chip chip-grade">
+                    <span class="chip-label">Grade</span>
+                    <span class="chip-val grade-display">—</span>
+                </div>
+            </div>
+            <!-- Dept. Course inputs -->
+            <div class="inputs-flex" id="cse108-patDept" style="display:none">
+                <div class="input-unit"><label>Sess 1</label><input type="number" max="100" class="s1" value="0"></div>
+                <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
+                <div class="input-unit"><label>Assignment</label><input type="number" max="100" class="asg" value="0"></div>
+                <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
                 <div class="result-chip chip-total">
                     <span class="chip-label">Total</span>
                     <span class="chip-val total-display">0</span>
@@ -928,12 +1042,12 @@
                 </div>
             </div>
 
-            <div class="subject-card" data-pattern="A" data-credits="2">
+            <div class="subject-card" data-pattern="A-50" data-credits="2">
                 <div class="card-top">
                     <div class="card-name">BIT100 — Biology for Engineers</div>
                     <div class="card-badges">
                         <span class="badge badge-gold">2 Credits</span>
-                        <span class="badge">Pattern A</span>
+                        <span class="badge">Pattern A · 50M</span>
                     </div>
                 </div>
                 <div class="inputs-flex">
@@ -941,7 +1055,6 @@
                     <div class="input-unit"><label>Sess 2</label><input type="number" max="100" class="s2" value="0"></div>
                     <div class="input-unit"><label>Assignment</label><input type="number" max="100" class="asg" value="0"></div>
                     <div class="input-unit"><label>End Sem Th</label><input type="number" max="100" class="est" value="0"></div>
-                    <div class="input-unit"><label>End Sem Pr /15</label><input type="number" max="15" class="esp" value="0"></div>
                     <div class="result-chip chip-total">
                         <span class="chip-label">Total</span>
                         <span class="chip-val total-display">0</span>
@@ -1031,6 +1144,55 @@
         return { grade: 'F', points: 0 };
     }
 
+    function toggleDeptDropdown(e, btn) {
+        e.stopPropagation();
+        const dd = document.getElementById('dept-dropdown');
+        dd.classList.toggle('open');
+        // Also activate the dept button visually
+        const cseBtn = document.querySelector('#cse108-card .psw-btn:first-of-type');
+        cseBtn.classList.remove('psw-active');
+        btn.classList.add('psw-active');
+        // Switch to dept panel
+        document.getElementById('cse108-card').setAttribute('data-pattern', 'A-50');
+        document.getElementById('cse108-patC').style.display = 'none';
+        document.getElementById('cse108-patDept').style.display = 'flex';
+        document.getElementById('cse108-patC').querySelectorAll('input').forEach(i => i.value = 0);
+        calculateAll();
+    }
+
+    function selectDept(code, btn) {
+        document.getElementById('dept-dropdown').classList.remove('open');
+        document.getElementById('dept-toggle-btn').textContent = code + ' ▾';
+        document.querySelectorAll('.dept-opt').forEach(o => o.classList.remove('selected'));
+        btn.classList.add('selected');
+        calculateAll();
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', () => {
+        const dd = document.getElementById('dept-dropdown');
+        if (dd) dd.classList.remove('open');
+    });
+
+    function switchCSE108(pattern, btn) {
+        const card = document.getElementById('cse108-card');
+        // If clicking CSE108/INT100 button
+        card.setAttribute('data-pattern', pattern === 'DEPT' ? 'A-50' : 'C');
+        document.getElementById('cse108-patC').style.display = pattern === 'C' ? 'flex' : 'none';
+        document.getElementById('cse108-patDept').style.display = pattern === 'DEPT' ? 'flex' : 'none';
+        const hiddenPanel = document.getElementById(pattern === 'C' ? 'cse108-patDept' : 'cse108-patC');
+        hiddenPanel.querySelectorAll('input[type="number"]').forEach(i => i.value = 0);
+        // Reset dept button label
+        if (pattern === 'C') {
+            document.getElementById('dept-toggle-btn').textContent = 'Dept. Course ▾';
+            document.querySelectorAll('.dept-opt').forEach(o => o.classList.remove('selected'));
+            document.getElementById('dept-dropdown').classList.remove('open');
+        }
+        card.querySelectorAll('.psw-btn').forEach(b => b.classList.remove('psw-active'));
+        btn.classList.add('psw-active');
+        calculateAll();
+    }
+
     function calculateAll() {
         const series = document.querySelector('input[name="seriesToggle"]:checked').value;
         const form = document.getElementById('calculator-form');
@@ -1046,7 +1208,12 @@
 
             const pattern = card.getAttribute('data-pattern');
             const credits = parseInt(card.getAttribute('data-credits'));
-            const g = (sel) => { const el = card.querySelector(sel); return el ? parseFloat(el.value) || 0 : 0; };
+            // Scope to visible inputs-flex (handles CSE108 dual-panel correctly)
+            const panels = card.querySelectorAll('.inputs-flex');
+            const activePanel = panels.length > 1
+                ? Array.from(panels).find(el => el.style.display !== 'none')
+                : (panels[0] || card);
+            const g = (sel) => { const el = activePanel.querySelector(sel); return el ? parseFloat(el.value) || 0 : 0; };
             let total = 0;
 
             if (pattern === 'A') {
@@ -1060,9 +1227,9 @@
             }
 
             if (total > 100) total = 100;
-            card.querySelector('.total-display').textContent = total.toFixed(1);
+            activePanel.querySelector('.total-display').textContent = total.toFixed(1);
             const { grade, points } = getGrade(total);
-            card.querySelector('.grade-display').textContent = grade;
+            activePanel.querySelector('.grade-display').textContent = grade;
             if (total > 0) active++;
             totalWeighted += points * credits;
             totalCredits += credits;
